@@ -1,6 +1,5 @@
 package com.example.bustrackingapplication;
 
-import android.app.AppComponentFactory;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +10,6 @@ import android.widget.EditText;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.jgabrielfreitas.core.BlurImageView;
-
-import org.w3c.dom.Text;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -63,7 +60,7 @@ public class Register extends AppCompatActivity {
                 session = new Session(cntx);
                 session.setusename(name);
 
-                startActivity(new Intent(Register.this, MapsActivity.class));
+                startActivity(new Intent(Register.this, MapsActivityLocationShare.class));
             }
         });
     }

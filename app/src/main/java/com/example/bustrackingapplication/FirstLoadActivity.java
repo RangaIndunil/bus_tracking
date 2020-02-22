@@ -1,19 +1,10 @@
 package com.example.bustrackingapplication;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.maps.SupportMapFragment;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 public class FirstLoadActivity extends FragmentActivity {
@@ -42,7 +33,7 @@ public class FirstLoadActivity extends FragmentActivity {
         track.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(FirstLoadActivity.this, MapsActivity.class));
+                startActivity(new Intent(FirstLoadActivity.this, MapsActivityLocationShare.class));
             }
         });
     }

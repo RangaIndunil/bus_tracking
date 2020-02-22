@@ -42,7 +42,7 @@
         </activity>
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".MapsActivityLocationShare"
             android:label="@string/app_name" />
 
         <activity
