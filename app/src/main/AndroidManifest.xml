@@ -49,6 +49,14 @@
             android:name=".Register"
             android:label="@string/app_name" />
 
+        <activity
+            android:name=".LocationReceiveDetails"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name=".MapActivityLocationReceive"
+            android:label="@string/app_name" />
+
     </application>
 
 </manifest>

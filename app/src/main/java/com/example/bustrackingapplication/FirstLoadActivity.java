@@ -33,7 +33,7 @@ public class FirstLoadActivity extends FragmentActivity {
         track.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(FirstLoadActivity.this, MapsActivityLocationShare.class));
+                startActivity(new Intent(FirstLoadActivity.this, LocationReceiveDetails.class));
             }
         });
     }

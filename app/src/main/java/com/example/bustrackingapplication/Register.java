@@ -34,7 +34,7 @@ public class Register extends AppCompatActivity {
     }
 
     public void nextStep(final Context cntx){
-        Button share = (Button) findViewById(R.id.share);
+        Button share = (Button) findViewById(R.id.search);
 
         share.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,9 +53,9 @@ public class Register extends AppCompatActivity {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myref = database.getReference();
 
-                myref.child("users").child(name).child("from").setValue(from);
-                myref.child("users").child(name).child("to").setValue(to);
-                myref.child("users").child(name).child("number").setValue(number);
+                myref.child("drivers").child(name).child("from").setValue(from);
+                myref.child("drivers").child(name).child("to").setValue(to);
+                myref.child("drivers").child(name).child("number").setValue(number);
 
                 session = new Session(cntx);
                 session.setusename(name);

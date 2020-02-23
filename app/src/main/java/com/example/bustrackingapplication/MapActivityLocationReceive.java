@@ -23,8 +23,15 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -37,17 +44,19 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
         GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
-    LocationRequest mLocationRequest;
-    Marker marker;
-    Session session;
-    int number;
-    String name;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
+    private HashMap<Integer, FirebaseReceiveData> hashMapMarkers;
+    private Marker marker;
+    private Session session;
+    private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        hashMapMarkers = new HashMap<>();
 
         session = new Session(this);
         name = session.getusename();
@@ -66,6 +75,31 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference();
+        // Attach a listener to read the data at our posts reference
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child : dataSnapshot.child("drivers").getChildren()){
+                    int index = child.child("index").getValue(int.class);
+                    double latitude = child.child("latitude").getValue(Double.class);
+                    double longitude = child.child("longitude").getValue(Double.class);
+                    String from = child.child("from").getValue(String.class);
+                    String to = child.child("to").getValue(String.class);
+                    String number = child.child("number").getValue(String.class);
+
+                    addMarkerToArray(index, from, to, latitude, longitude, number);
+                    updateMap();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
     }
 
 
@@ -119,12 +153,6 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-
-        LatLng SahidKhudiram = new LatLng(22.466, 88.3918);
-        showMap(SahidKhudiram, "SahidKhudiram Metro");
-
-        LatLng kaviNazrul = new LatLng(22.4641823, 88.38060670000004);
-        showMap(kaviNazrul, "kaviNazrul Metro");
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -149,20 +177,54 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
                 fillColor(Color.TRANSPARENT));
     }
 
+    private void addMarkerToArray(int index, String from, String to, double latitude, double longitude, String number) {
+
+        FirebaseReceiveData fbdata = new FirebaseReceiveData(index, number, from, to, latitude, longitude);
+
+        if(hashMapMarkers != null){
+            Iterator<Map.Entry<Integer, FirebaseReceiveData> >
+                    iterator = hashMapMarkers.entrySet().iterator();
+
+            while (iterator.hasNext()) {
+                Map.Entry<Integer, FirebaseReceiveData>
+                        entry
+                        = iterator.next();
+                if (index == entry.getKey()) {
+                    hashMapMarkers.remove(index);
+                }
+            }
+        }
+        hashMapMarkers.put(index, fbdata);
+    }
+
+    public void updateMap(){
+        if(mMap != null){
+            mMap.clear();
+        }
+
+        Iterator<Map.Entry<Integer, FirebaseReceiveData> >
+                iterator = hashMapMarkers.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, FirebaseReceiveData>
+                    entry
+                    = iterator.next();
+            FirebaseReceiveData hashMapMaker = entry.getValue();
+            MarkerOptions options = new MarkerOptions().position(new LatLng(hashMapMaker.getLatitude(),
+                    hashMapMaker.getLongitude())).title(Integer.toString(entry.getKey()));
+            marker = mMap.addMarker(options);
+        }
+    }
+
     @Override
     public void onLocationChanged(Location location) {
 
         Toast.makeText(this, "new location found", Toast.LENGTH_SHORT).show();
 
-
         mLastLocation = location;
 
-        //Place current location marker
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-        showMap(latLng, "Me");
-        setFirebaseData(name, location, number);
-        number ++;
+        addMarkerToArray(1, "myPlace", "myPlace", location.getLatitude(),
+                location.getLongitude(), "Me");
+        updateMap();
     }
 
     private boolean isGooglePlayServicesAvailable() {
@@ -231,16 +293,6 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
             // other 'case' lines to check for other permissions this app might request.
             // You can add here other case statements according to your requirement.
         }
-    }
-
-    public void setFirebaseData(String name, Location location, int no){
-        //Write a message to the database
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myref = database.getReference();
-
-        myref.child("users").child(name).child("latitude").setValue(location.getLatitude());
-        myref.child("users").child(name).child("longitude").setValue(location.getLongitude());
-        myref.child("users").child(name).child("count").setValue(no);
     }
 }
 

@@ -119,12 +119,6 @@ public class MapsActivityLocationShare extends FragmentActivity implements OnMap
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-
-        LatLng SahidKhudiram = new LatLng(22.466, 88.3918);
-        showMap(SahidKhudiram, "SahidKhudiram Metro");
-
-        LatLng kaviNazrul = new LatLng(22.4641823, 88.38060670000004);
-        showMap(kaviNazrul, "kaviNazrul Metro");
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -161,8 +155,7 @@ public class MapsActivityLocationShare extends FragmentActivity implements OnMap
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
         showMap(latLng, "Me");
-        setFirebaseData(name, location, number);
-        number ++;
+        setFirebaseData(name, location);
     }
 
     private boolean isGooglePlayServicesAvailable() {
@@ -233,14 +226,13 @@ public class MapsActivityLocationShare extends FragmentActivity implements OnMap
         }
     }
 
-    public void setFirebaseData(String name, Location location, int no){
+    public void setFirebaseData(String name, Location location){
         //Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myref = database.getReference();
 
-        myref.child("users").child(name).child("latitude").setValue(location.getLatitude());
-        myref.child("users").child(name).child("longitude").setValue(location.getLongitude());
-        myref.child("users").child(name).child("count").setValue(no);
+        myref.child("drivers").child(name).child("latitude").setValue(location.getLatitude());
+        myref.child("drivers").child(name).child("longitude").setValue(location.getLongitude());
     }
 }
 
