@@ -42,7 +42,6 @@ public class MapsActivityLocationShare extends FragmentActivity implements OnMap
     LocationRequest mLocationRequest;
     Marker marker;
     Session session;
-    int number;
     String name;
 
     @Override

@@ -10,9 +10,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,6 +21,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,19 +37,20 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-public class MapActivityLocationReceive  extends FragmentActivity implements OnMapReadyCallback,
-        LocationListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class MapActivityLocationReceive  extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
-    private LocationRequest mLocationRequest;
-    private HashMap<Integer, FirebaseReceiveData> hashMapMarkers;
+    private FusedLocationProviderClient fusedLocationClient;
+    private HashMap<String, FirebaseReceiveData> hashMapMarkers;
     private Marker marker;
-    private Session session;
-    private String name;
+
+    private GetLookingName getLookingName;
+    private GetLookingFrom getLookingFrom;
+    private GetLookingTo getLookingTo;
+
+    private String looking_from;
+    private String looking_to;
+    private String looking_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +58,13 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
 
         hashMapMarkers = new HashMap<>();
 
-        session = new Session(this);
-        name = session.getusename();
+        getLookingName = new GetLookingName(this);
+        getLookingFrom = new GetLookingFrom(this);
+        getLookingTo = new GetLookingTo(this);
+
+        looking_name = getLookingName.getname();
+        looking_from = getLookingFrom.getfrom();
+        looking_to = getLookingTo.getto();
 
         //show error dialog if GoolglePlayServices not available
         if (!isGooglePlayServicesAvailable()) {
@@ -83,15 +88,13 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child : dataSnapshot.child("drivers").getChildren()){
-                    int index = child.child("index").getValue(int.class);
                     double latitude = child.child("latitude").getValue(Double.class);
                     double longitude = child.child("longitude").getValue(Double.class);
                     String from = child.child("from").getValue(String.class);
                     String to = child.child("to").getValue(String.class);
                     String number = child.child("number").getValue(String.class);
 
-                    addMarkerToArray(index, from, to, latitude, longitude, number);
-                    updateMap();
+                    addMarkerToMap(from, to, latitude, longitude, number);
                 }
             }
 
@@ -146,27 +149,54 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
             if (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
-                buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
             }
         } else {
-            buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        mGoogleApiClient.connect();
+    private void addMarkerToMap(String from, String to, double latitude, double longitude, String number) {
+        if(hashMapMarkers != null){
+            mMap.clear();
+
+            for (Map.Entry<String, FirebaseReceiveData> me : hashMapMarkers.entrySet()) {
+                String current_name = me.getKey();
+                if(number == current_name){
+                    hashMapMarkers.remove(number);
+                }
+            }
+        }
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            showMap(latLng, "me");
+                        }
+                    }
+                });
+
+        FirebaseReceiveData data = new FirebaseReceiveData(number, from, to, latitude, longitude);
+        hashMapMarkers.put(number, data);
+
+        for (Map.Entry<String, FirebaseReceiveData> me : hashMapMarkers.entrySet()) {
+            String current_name = me.getKey();
+            FirebaseReceiveData hashMapMaker = hashMapMarkers.get(current_name);
+            MarkerOptions options = new MarkerOptions().position(new LatLng(hashMapMaker.getLatitude(),
+                    hashMapMaker.getLongitude())).title(hashMapMaker.getNumber());
+            mMap.addMarker(options);
+        }
     }
 
     private void showMap(LatLng latLng, String place) {
         CameraPosition cameraPosition = new CameraPosition.Builder().target(
-                latLng).zoom(14).tilt(60).bearing(30).build();
+                latLng).zoom(13).tilt(60).bearing(30).build();
         marker = mMap.addMarker(new MarkerOptions().position(latLng).title(place));
         marker.showInfoWindow();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -177,56 +207,6 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
                 fillColor(Color.TRANSPARENT));
     }
 
-    private void addMarkerToArray(int index, String from, String to, double latitude, double longitude, String number) {
-
-        FirebaseReceiveData fbdata = new FirebaseReceiveData(index, number, from, to, latitude, longitude);
-
-        if(hashMapMarkers != null){
-            Iterator<Map.Entry<Integer, FirebaseReceiveData> >
-                    iterator = hashMapMarkers.entrySet().iterator();
-
-            while (iterator.hasNext()) {
-                Map.Entry<Integer, FirebaseReceiveData>
-                        entry
-                        = iterator.next();
-                if (index == entry.getKey()) {
-                    hashMapMarkers.remove(index);
-                }
-            }
-        }
-        hashMapMarkers.put(index, fbdata);
-    }
-
-    public void updateMap(){
-        if(mMap != null){
-            mMap.clear();
-        }
-
-        Iterator<Map.Entry<Integer, FirebaseReceiveData> >
-                iterator = hashMapMarkers.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Integer, FirebaseReceiveData>
-                    entry
-                    = iterator.next();
-            FirebaseReceiveData hashMapMaker = entry.getValue();
-            MarkerOptions options = new MarkerOptions().position(new LatLng(hashMapMaker.getLatitude(),
-                    hashMapMaker.getLongitude())).title(Integer.toString(entry.getKey()));
-            marker = mMap.addMarker(options);
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-        Toast.makeText(this, "new location found", Toast.LENGTH_SHORT).show();
-
-        mLastLocation = location;
-
-        addMarkerToArray(1, "myPlace", "myPlace", location.getLatitude(),
-                location.getLongitude(), "Me");
-        updateMap();
-    }
-
     private boolean isGooglePlayServicesAvailable() {
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (ConnectionResult.SUCCESS == status) {
@@ -235,31 +215,6 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
             GooglePlayServicesUtil.getErrorDialog(status, this, 0).show();
             return false;
         }
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
     }
 
     @Override
@@ -275,10 +230,6 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
                     if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
-
-                        if (mGoogleApiClient == null) {
-                            buildGoogleApiClient();
-                        }
                         mMap.setMyLocationEnabled(true);
                     }
 
@@ -295,8 +246,3 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
         }
     }
 }
-
-
-
-
-
