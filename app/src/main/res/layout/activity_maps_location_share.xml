@@ -12,26 +12,4 @@
     android:layout_alignParentTop="true"
     class="com.google.android.gms.maps.SupportMapFragment" />
 
-    <EditText
-    android:id="@+id/searchView1"
-    android:layout_width="250dp"
-    android:layout_height="34dp"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentTop="true"
-    android:layout_marginLeft="18dp"
-    android:layout_marginTop="14dp"
-    android:hint="Search Location"
-    android:textColor="@android:color/black"
-    android:background="@android:color/white" >
-    </EditText>
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="28dp"
-        android:layout_height="25dp"
-        android:layout_alignBaseline="@+id/searchView1"
-        android:layout_alignRight="@+id/searchView1"
-        android:layout_alignBottom="@+id/searchView1"
-        android:background="@drawable/btn_resource" />
-
 </RelativeLayout>

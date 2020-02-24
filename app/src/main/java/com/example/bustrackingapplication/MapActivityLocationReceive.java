@@ -1,6 +1,7 @@
 package com.example.bustrackingapplication;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -51,6 +52,8 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
     private String looking_from;
     private String looking_to;
     private String looking_name;
+    private boolean bus_availability = false;
+    private int counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +65,14 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
         getLookingFrom = new GetLookingFrom(this);
         getLookingTo = new GetLookingTo(this);
 
-        looking_name = getLookingName.getname();
-        looking_from = getLookingFrom.getfrom();
-        looking_to = getLookingTo.getto();
+        final Context cntx = this;
+
+        looking_name = (String) getLookingName.getname();
+        getLookingName.setname("");
+        looking_from = (String) getLookingFrom.getfrom();
+        getLookingFrom.setfrom("");
+        looking_to = (String) getLookingTo.getto();
+        getLookingTo.setto("");
 
         //show error dialog if GoolglePlayServices not available
         if (!isGooglePlayServicesAvailable()) {
@@ -88,13 +96,36 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child : dataSnapshot.child("drivers").getChildren()){
+                    String name = (String) child.getKey();
                     double latitude = child.child("latitude").getValue(Double.class);
                     double longitude = child.child("longitude").getValue(Double.class);
                     String from = child.child("from").getValue(String.class);
                     String to = child.child("to").getValue(String.class);
                     String number = child.child("number").getValue(String.class);
+                    String type = child.child("type").getValue(String.class);
 
-                    addMarkerToMap(from, to, latitude, longitude, number);
+                    if(looking_name != null || !looking_name.equals("")){
+                        if (looking_name.equals(name)) {
+                            addMarkerToMap(from, to, latitude, longitude, number, type);
+                            bus_availability = true;
+                        }
+                    }
+
+                    if((looking_from != null && !looking_from.equals("")) || (looking_to != null &&
+                            !looking_to.equals(""))){
+                        if(looking_from.equals(from) && looking_to.equals(to)){
+                            addMarkerToMap(from, to, latitude, longitude, number, type);
+                            bus_availability = true;
+                        }
+                    }
+
+                    counter ++;
+
+                    if (counter == dataSnapshot.getChildrenCount() && !bus_availability) {
+                        Toast.makeText(cntx, "No bus available, Please check your inputs"
+                                    , Toast.LENGTH_LONG).show();
+                    }
+
                 }
             }
 
@@ -156,7 +187,8 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
         }
     }
 
-    private void addMarkerToMap(String from, String to, double latitude, double longitude, String number) {
+    private void addMarkerToMap(String from, String to, double latitude, double longitude,
+                                String number, String type) {
         if(hashMapMarkers != null){
             mMap.clear();
 
@@ -182,15 +214,16 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
                     }
                 });
 
-        FirebaseReceiveData data = new FirebaseReceiveData(number, from, to, latitude, longitude);
+        FirebaseReceiveData data = new FirebaseReceiveData(number, from, to, latitude, longitude, type);
         hashMapMarkers.put(number, data);
 
         for (Map.Entry<String, FirebaseReceiveData> me : hashMapMarkers.entrySet()) {
             String current_name = me.getKey();
             FirebaseReceiveData hashMapMaker = hashMapMarkers.get(current_name);
             MarkerOptions options = new MarkerOptions().position(new LatLng(hashMapMaker.getLatitude(),
-                    hashMapMaker.getLongitude())).title(hashMapMaker.getNumber());
-            mMap.addMarker(options);
+                    hashMapMaker.getLongitude())).title("Number : " + hashMapMaker.getNumber()
+                    + ", Type : " + hashMapMaker.getType());
+            marker = mMap.addMarker(options);
         }
     }
 

@@ -48,6 +48,8 @@ public class Register extends AppCompatActivity {
                 String to = to_text.getText().toString();
                 EditText number_text = (EditText) findViewById(R.id.bus_number);
                 String number = number_text.getText().toString();
+                EditText type_text = (EditText) findViewById(R.id.bus_number);
+                String type = number_text.getText().toString();
 
                 //Write a message to the database
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -56,6 +58,9 @@ public class Register extends AppCompatActivity {
                 myref.child("drivers").child(name).child("from").setValue(from);
                 myref.child("drivers").child(name).child("to").setValue(to);
                 myref.child("drivers").child(name).child("number").setValue(number);
+                myref.child("drivers").child(name).child("type").setValue(type);
+                myref.child("drivers").child(name).child("latitude").setValue(6.88);
+                myref.child("drivers").child(name).child("longitude").setValue(8.01);
 
                 session = new Session(cntx);
                 session.setusename(name);
