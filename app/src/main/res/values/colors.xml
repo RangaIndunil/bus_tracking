@@ -5,4 +5,7 @@
     <color name="colorAccent">#292F33</color>
     <color name="btn_color">#FFFFFF</color>
     <color name="btn_bc_color">#D62635</color>
+    <color name="hometext">#000000</color>
+    <color name="background">#b57741</color>
+    <color name="title">#633f08</color>
 </resources>

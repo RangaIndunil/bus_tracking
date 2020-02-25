@@ -4,36 +4,47 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="100dp"
+    android:background="@color/background"
     android:gravity="center_horizontal|top"
     android:orientation="vertical"
     tools:context=".FirstLoadActivity">
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="80dp" />
 
     <TextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Bus Tracking Application"></TextView>
+        android:text="Bus Tracking Application"
+        android:textColor="@color/hometext"
+        android:textSize="30sp"
+        android:textStyle="bold|italic"></TextView>
 
     <Space
         android:layout_width="1dp"
-        android:layout_height="20dp" />
+        android:layout_height="60dp" />
 
     <Button
         android:id="@+id/sharing"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/btn_resource"
         android:text="Location Share"
+        android:textColor="@color/hometext"
         android:visibility="visible" />
 
     <Space
         android:layout_width="1dp"
-        android:layout_height="20dp" />
+        android:layout_height="60dp" />
 
     <Button
         android:id="@+id/tracking"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
-        android:text="Track Buses" />
+        android:background="@drawable/btn_resource"
+        android:text="Track Buses"
+        android:textColorHint="@color/hometext" />
 </LinearLayout>

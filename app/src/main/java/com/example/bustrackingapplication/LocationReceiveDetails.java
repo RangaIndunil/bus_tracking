@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class LocationReceiveDetails extends AppCompatActivity {
 
-    BlurImageView blurImageView;
+    //BlurImageView blurImageView;
 
     private GetLookingTo getLookingTo;
     private GetLookingFrom getLookingFrom;
@@ -26,8 +26,8 @@ public class LocationReceiveDetails extends AppCompatActivity {
 
         setContentView(R.layout.location_receive_details);
 
-        blurImageView = (BlurImageView) findViewById(R.id.BlurImageView);
-        blurImageView.setBlur(15);
+        //blurImageView = (BlurImageView) findViewById(R.id.BlurImageView);
+        //blurImageView.setBlur(15);
 
         nextStep(this);
 

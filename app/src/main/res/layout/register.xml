@@ -3,16 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <com.jgabrielfreitas.core.BlurImageView
-        android:id="@+id/BlurImageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/cartoon_sl_bus" />
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
     <TextView
         android:id="@+id/head01"
@@ -21,6 +13,7 @@
         android:layout_marginTop="32dp"
         android:autoText="true"
         android:text="Register"
+        android:textColor="@color/hometext"
         android:textSize="24sp"
         android:textStyle="bold|italic"
         app:autoSizeMaxTextSize="100dp"
@@ -33,9 +26,10 @@
         android:layout_width="200dp"
         android:layout_height="40dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="100dp"
         android:ems="10"
         android:inputType="textPersonName"
+        android:textColor="@color/hometext"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,6 +41,7 @@
         android:layout_marginTop="20dp"
         android:ems="10"
         android:inputType="textPersonName"
+        android:textColor="@color/hometext"
         app:layout_constraintStart_toEndOf="@+id/name_label"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
@@ -58,6 +53,7 @@
         android:layout_marginTop="20dp"
         android:ems="10"
         android:inputType="textPersonName"
+        android:textColor="@color/hometext"
         app:layout_constraintStart_toEndOf="@+id/to_label"
         app:layout_constraintTop_toBottomOf="@+id/from" />
 
@@ -69,7 +65,7 @@
         android:background="@drawable/btn_resource"
         android:shadowRadius="20"
         android:text="Share"
-        android:textColor="@color/btn_color"
+        android:textColor="@color/hometext"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.54"
@@ -81,9 +77,9 @@
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="100dp"
         android:text="Name"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/hometext"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -95,7 +91,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="20dp"
         android:text="From"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/hometext"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -107,7 +103,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="20dp"
         android:text="To"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/hometext"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/name_label" />
@@ -119,7 +115,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="20dp"
         android:text="Bus Number"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/hometext"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/to_label" />
@@ -131,9 +127,9 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="20dp"
         android:text="Type"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/hometext"
         android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/BlurImageView"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bus_number_label" />
 
     <EditText

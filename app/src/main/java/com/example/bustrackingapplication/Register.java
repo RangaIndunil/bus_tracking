@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class Register extends AppCompatActivity {
 
-    BlurImageView blurImageView;
+    //BlurImageView blurImageView;
 
     private Session session;//global variable
     private String name;
@@ -26,8 +26,8 @@ public class Register extends AppCompatActivity {
 
         setContentView(R.layout.register);
 
-        blurImageView = (BlurImageView) findViewById(R.id.BlurImageView);
-        blurImageView.setBlur(15);
+        //blurImageView = (BlurImageView) findViewById(R.id.BlurImageView);
+        //blurImageView.setBlur(15);
 
         nextStep(this);
 
