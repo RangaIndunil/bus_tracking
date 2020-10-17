@@ -17,6 +17,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -136,7 +137,6 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
         });
     }
 
-
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
     public boolean checkLocationPermission() {
@@ -221,7 +221,7 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
             String current_name = me.getKey();
             FirebaseReceiveData hashMapMaker = hashMapMarkers.get(current_name);
             MarkerOptions options = new MarkerOptions().position(new LatLng(hashMapMaker.getLatitude(),
-                    hashMapMaker.getLongitude())).title("Number : " + hashMapMaker.getNumber()
+                    hashMapMaker.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_marker)).title("Number : " + hashMapMaker.getNumber()
                     + ", Type : " + hashMapMaker.getType());
             marker = mMap.addMarker(options);
         }

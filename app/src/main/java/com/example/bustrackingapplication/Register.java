@@ -48,8 +48,8 @@ public class Register extends AppCompatActivity {
                 String to = to_text.getText().toString();
                 EditText number_text = (EditText) findViewById(R.id.bus_number);
                 String number = number_text.getText().toString();
-                EditText type_text = (EditText) findViewById(R.id.bus_number);
-                String type = number_text.getText().toString();
+                EditText type_text = (EditText) findViewById(R.id.type);
+                String type = type_text.getText().toString();
 
                 //Write a message to the database
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
