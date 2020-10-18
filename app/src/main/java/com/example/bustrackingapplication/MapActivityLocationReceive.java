@@ -2,6 +2,7 @@ package com.example.bustrackingapplication;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -189,6 +190,11 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
         } else {
             mMap.setMyLocationEnabled(true);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(MapActivityLocationReceive.this, FirstLoadActivity.class));
     }
 
     private void addMarkerToMap(String from, String to, double latitude, double longitude,
