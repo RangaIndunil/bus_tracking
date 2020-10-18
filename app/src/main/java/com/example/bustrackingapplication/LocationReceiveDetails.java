@@ -6,7 +6,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.jgabrielfreitas.core.BlurImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +24,11 @@ public class LocationReceiveDetails extends AppCompatActivity {
     private GetLookingTo getLookingTo;
     private GetLookingFrom getLookingFrom;
     private GetLookingName getLookingName;
+
+    private boolean status = false;
+    private String from;
+    private String to;
+    private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +53,48 @@ public class LocationReceiveDetails extends AppCompatActivity {
             public void onClick(View v) {
 
                 EditText from_text = (EditText) findViewById(R.id.from);
-                String from = from_text.getText().toString();
+                from = from_text.getText().toString();
                 EditText to_text = (EditText) findViewById(R.id.to);
-                String to = to_text.getText().toString();
+                to = to_text.getText().toString();
+
+                if (from.equals(null) || from.equals("") || to.equals(null) || to.equals("")){
+                    Toast.makeText(cntx, "Please insert the root details", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference ref = database.getReference();
+                // Attach a listener to read the data at our posts reference
+                ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        try {
+                            for (DataSnapshot child : dataSnapshot.child("drivers").getChildren()){
+                                String firebase_name = (String) child.getKey();
+                                String firebase_from = child.child("from").getValue(String.class);
+                                String firebase_to = child.child("to").getValue(String.class);
+
+                                if(from.equals(firebase_from) && to.equals(firebase_to)){
+                                    status = true;
+                                }
+                            }
+                        }catch (Exception e){
+                            return;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
+
+                if (!status){
+                    Toast.makeText(cntx, "There are no bus match with your input, Please try again latter", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                status = false;
 
                 getLookingFrom = new GetLookingFrom(cntx);
                 getLookingFrom.setfrom(from);
@@ -60,7 +110,44 @@ public class LocationReceiveDetails extends AppCompatActivity {
             public void onClick(View v) {
 
                 EditText name_text = (EditText) findViewById(R.id.name);
-                String name = name_text.getText().toString();
+                name = name_text.getText().toString();
+
+                if (name.equals(null) || name.equals("")){
+                    Toast.makeText(cntx, "Please insert the name", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference ref = database.getReference();
+                // Attach a listener to read the data at our posts reference
+                ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        try {
+                            for (DataSnapshot child : dataSnapshot.child("drivers").getChildren()){
+                                String firebase_name = (String) child.getKey();
+
+                                if(name.equals(firebase_name)){
+                                    status = true;
+                                }
+                            }
+                        }catch (Exception e){
+                            return;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
+
+                if (!status){
+                    Toast.makeText(cntx, "There are no bus match with your input, Please try again latter", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                status = false;
 
                 getLookingName = new GetLookingName(cntx);
                 getLookingName.setname(name);
