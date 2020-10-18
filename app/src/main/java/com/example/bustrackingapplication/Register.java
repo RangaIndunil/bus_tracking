@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -50,6 +51,27 @@ public class Register extends AppCompatActivity {
                 String number = number_text.getText().toString();
                 EditText type_text = (EditText) findViewById(R.id.type);
                 String type = type_text.getText().toString();
+
+                if (name.equals(null) || name.equals("")){
+                    Toast.makeText(cntx, "Please insert the name", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (from.equals(null) || from.equals("")){
+                    Toast.makeText(cntx, "Please insert root from", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (to.equals(null) || to.equals("")){
+                    Toast.makeText(cntx, "Please insert root to", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (number.equals(null) || number.equals("")){
+                    Toast.makeText(cntx, "Please insert bus mumber", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (type.equals(null) || type.equals("")){
+                    Toast.makeText(cntx, "Please insert bus type", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 //Write a message to the database
                 FirebaseDatabase database = FirebaseDatabase.getInstance();

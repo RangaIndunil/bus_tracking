@@ -96,38 +96,42 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot child : dataSnapshot.child("drivers").getChildren()){
-                    String name = (String) child.getKey();
-                    double latitude = child.child("latitude").getValue(Double.class);
-                    double longitude = child.child("longitude").getValue(Double.class);
-                    String from = child.child("from").getValue(String.class);
-                    String to = child.child("to").getValue(String.class);
-                    String number = child.child("number").getValue(String.class);
-                    String type = child.child("type").getValue(String.class);
+                try {
+                    for (DataSnapshot child : dataSnapshot.child("drivers").getChildren()){
+                        String name = (String) child.getKey();
+                        double latitude = child.child("latitude").getValue(Double.class);
+                        double longitude = child.child("longitude").getValue(Double.class);
+                        String from = child.child("from").getValue(String.class);
+                        String to = child.child("to").getValue(String.class);
+                        String number = child.child("number").getValue(String.class);
+                        String type = child.child("type").getValue(String.class);
 
-                    if(looking_name != null || !looking_name.equals("")){
-                        if (looking_name.equals(name)) {
-                            addMarkerToMap(from, to, latitude, longitude, number, type);
-                            bus_availability = true;
+                        if(looking_name != null || !looking_name.equals("")){
+                            if (looking_name.equals(name)) {
+                                addMarkerToMap(from, to, latitude, longitude, number, type);
+                                bus_availability = true;
+                            }
                         }
-                    }
 
-                    if((looking_from != null && !looking_from.equals("")) || (looking_to != null &&
-                            !looking_to.equals(""))){
-                        if(looking_from.equals(from) && looking_to.equals(to)){
-                            addMarkerToMap(from, to, latitude, longitude, number, type);
-                            bus_availability = true;
+                        if((looking_from != null && !looking_from.equals("")) || (looking_to != null &&
+                                !looking_to.equals(""))){
+                            if(looking_from.equals(from) && looking_to.equals(to)){
+                                addMarkerToMap(from, to, latitude, longitude, number, type);
+                                bus_availability = true;
+                            }
                         }
-                    }
 
-                    counter ++;
+                        counter ++;
 
-                    if (counter == dataSnapshot.getChildrenCount() && !bus_availability) {
-                        Toast.makeText(cntx, "No bus available, Please check your inputs"
+                        if (counter == dataSnapshot.getChildrenCount() && !bus_availability) {
+                            Toast.makeText(cntx, "No bus available, Please check your inputs"
                                     , Toast.LENGTH_LONG).show();
+                        }
                     }
-
+                }catch (Exception e){
+                    return;
                 }
+
             }
 
             @Override
@@ -190,14 +194,13 @@ public class MapActivityLocationReceive  extends FragmentActivity implements OnM
     private void addMarkerToMap(String from, String to, double latitude, double longitude,
                                 String number, String type) {
         if(hashMapMarkers != null){
-            mMap.clear();
-
             for (Map.Entry<String, FirebaseReceiveData> me : hashMapMarkers.entrySet()) {
                 String current_name = me.getKey();
                 if(number == current_name){
                     hashMapMarkers.remove(number);
                 }
             }
+            mMap.clear();
         }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);

@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -130,8 +131,9 @@ public class MapsActivityLocationShare extends FragmentActivity implements OnMap
     }
 
     private void showMap(LatLng latLng, String place) {
+        mMap.clear();
         CameraPosition cameraPosition = new CameraPosition.Builder().target(
-                latLng).zoom(14).tilt(60).bearing(30).build();
+                latLng).zoom(18).tilt(60).bearing(30).build();
         marker = mMap.addMarker(new MarkerOptions().position(latLng).title(place));
         marker.showInfoWindow();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -143,10 +145,14 @@ public class MapsActivityLocationShare extends FragmentActivity implements OnMap
     }
 
     @Override
+    public void onBackPressed() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        deleteFirebaseData(name);
+        startActivity(new Intent(MapsActivityLocationShare.this, FirstLoadActivity.class));
+    }
+
+    @Override
     public void onLocationChanged(Location location) {
-
-        Toast.makeText(this, "new location found", Toast.LENGTH_SHORT).show();
-
 
         mLastLocation = location;
 
@@ -223,6 +229,14 @@ public class MapsActivityLocationShare extends FragmentActivity implements OnMap
             // other 'case' lines to check for other permissions this app might request.
             // You can add here other case statements according to your requirement.
         }
+    }
+
+    public void deleteFirebaseData(String name){
+        //Write a message to the database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myref = database.getReference();
+
+        myref.child("drivers").child(name).removeValue();
     }
 
     public void setFirebaseData(String name, Location location){
